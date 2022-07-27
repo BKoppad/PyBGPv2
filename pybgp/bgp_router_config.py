@@ -24,16 +24,18 @@ class BGP_Router:
         self.shell.send('enable\n')
         self.shell.send('cisco\n')
         time.sleep(1)
-        output = self.shell.recv(10000).decode()
-        print(output)
+        output1 = self.shell.recv(10000).decode()
+        print(output1)
         command = " "
         
         while command != 'exit':
             command= input("> ")
             self.shell.send(f"{command}\n")
             time.sleep(3)
-            output=self.shell.recv(10000).decode()
-            print(output)
+            output2=self.shell.recv(10000).decode()
+            print(output2)
+        
+        return True
     
     def __del__(self):
         print("Closing connection")
