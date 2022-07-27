@@ -2,8 +2,9 @@
 Sample tests for bgp_router_config.py
 """
 from django.test import SimpleTestCase
-from unittest import patch
-from app import bgp_router_config
+from unittest.mock import patch
+from pybgp import bgp_router_config
+import sys
 
 class ConnectSshTests(SimpleTestCase):
     """" Test connect_ssh module """
@@ -21,16 +22,14 @@ class ConnectSshTests(SimpleTestCase):
         res = user2.connect_ssh(router2)
         self.assertTrue(True,res)
 
-    @patch('user3.cli_access()', return_value='>')
-    def test_router_cli_access_1(self):
+    @patch('builtins.input', side_effect=['show ip bgp','exit'])
+    def test_router_cli_access_1(self, input):
         """Test command exceution on router working as expected"""
         router = {'hostname': '10.1.1.10', 'port': '22', 'username':'bkoppad', 'password':'cisco'} 
         user3 = bgp_router_config.BGP_Router()
-        c = Client()
         user3.connect_ssh(router)
-        user3.cli_access()
-        self.assertEqual(user3.cli_access(),'>')  
-        # self.assertTrue(True,res)
+        res= user3.cli_access() 
+        self.assertTrue(True,res)
 
     # Ping test
     # returning ssh_clinet object
