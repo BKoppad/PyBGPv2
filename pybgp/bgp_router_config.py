@@ -40,3 +40,11 @@ class BGP_Router:
     def __del__(self):
         print("Closing connection")
         self.ssh_client.close()
+
+class BGP_config:
+    def interface_config(slef,router):
+        """This proc is used to configure the interfaces for BGP protocol"""
+        router=BGP_Router()
+        router.connect_ssh(router)
+        router.cli_access()
+
