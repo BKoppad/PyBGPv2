@@ -1,22 +1,19 @@
-name: Django CI
+name: Checks
 
-on:
-  push:
-    branches: [ "master", "dev" ]
-  pull_request:
-    branches: [ "master", "dev" ]
+on: [push]
 
 jobs:
-  build:
-
-    runs-on: ubuntu-latest
+    test-lint:
+      name : Test and Lint
+      runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
       matrix:
         python-version: 3.9
 
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout
+      uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
       with:
@@ -26,5 +23,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     - name: Run Tests
-      run: |
-        python manage.py test
+      run: python manage.py test
+    - name: Lint
+      run: flake8
