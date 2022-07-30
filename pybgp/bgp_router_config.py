@@ -47,4 +47,3 @@ class BGP_config:
         router=BGP_Router()
         router.connect_ssh(router)
         router.cli_access()
-
