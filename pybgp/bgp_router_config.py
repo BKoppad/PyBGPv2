@@ -24,21 +24,25 @@ class BGP_Router:
         '''Executing commands on resepctive router'''
         self.shell = self.ssh_client.invoke_shell()
         print(self.shell.send_ready())
+        # Enabling router with password
         self.shell.send('enable\n')
         self.shell.send('cisco\n')
         time.sleep(1)
         output1 = self.shell.recv(10000).decode()
         print(output1)
         command = " "
+        outPutList = []
 
+        # User inputs commands to be executed on router
         while command != 'exit':
             command = input("> ")
             self.shell.send(f"{command}\n")
             time.sleep(3)
             output2 = self.shell.recv(10000).decode()
+            outPutList.append(output2)
             print(output2)
 
-        return True
+        return outPutList
 
     def __del__(self):
         print("Closing connection")
@@ -47,7 +51,7 @@ class BGP_Router:
 
 class BGP_config:
 
-    def interface_config(slef, router):
+    def interface_config(self, router):
         """This proc is used to configure the interfaces for BGP protocol"""
         router = BGP_Router()
         router.connect_ssh(router)

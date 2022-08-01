@@ -8,6 +8,21 @@ from pybgp import bgp_router_config
 
 class ConnectSshTests(SimpleTestCase):
     """" Test connect_ssh module """
+    # Defining Router-1 parametrs for connection
+    router1 = {'hostname': '10.1.1.10',
+               'port': '22',
+               'username': 'bkoppad',
+               'password': 'cisco'}
+
+    # Defining Router-2 parametrs for connection from Router-1
+    # by altering its hostname
+    router2 = router1.copy()
+    router2['hostname'] = '10.1.1.20'
+
+    # Defining Router-3 parametrs for connection from Router-1
+    # by altering its password for negative testing
+    router3 = router1.copy()
+    router3['password'] = 'juniper'
 
     def test_router_connect_success(self):
         """Test whether conncetion with router is successfull"""
@@ -38,8 +53,6 @@ class ConnectSshTests(SimpleTestCase):
                   'password': 'cisco'}
         user3 = bgp_router_config.BGP_Router()
         user3.connect_ssh(router)
-        res = user3.cli_access()
-        self.assertTrue(True, res)
-
-    # Ping test
-    # returning ssh_clinet object
+        res = "".join(user3.cli_access())
+        # print("Output==", res)
+        self.assertIn('BGP not active', res.replace('\r\n', ' '))
