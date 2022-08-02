@@ -24,35 +24,86 @@ class ConnectSshTests(SimpleTestCase):
     router3 = router1.copy()
     router3['password'] = 'juniper'
 
+    # Cisco router commands for interface configuration of R1 and R2
+    r1Intconfig = ["config t",
+                   "int gi0/1",
+                   "ip address 10.10.10.1 255.255.255.0",
+                   "no shut"]
+    r2Intconfig = ["config t",
+                   "int gi0/1",
+                   "ip address 10.10.10.2 255.255.255.0",
+                   "no shut"]
+
+    # Cisco router commands for BGP Neighbor configuration
+    #  of R1 and R2 with same password
+    r1BGPConfig = ["router bgp 100",
+                   "neighbor 10.10.10.2 remote-as 100",
+                   "neighbor 10.10.10.2 password cisco",
+                   "neighbor 10.10.10.2 update-source gi0/1",
+                   "no auto-summary",
+                   "end",
+                   "exit"]
+    r2BGPConfig = ["router bgp 100",
+                   "neighbor 10.10.10.1 remote-as 100",
+                   "neighbor 10.10.10.1 password cisco",
+                   "neighbor 10.10.10.1 update-source gi0/1",
+                   "no auto-summary",
+                   "end",
+                   "exit"]
+
+    # Cisco router commands for BGP Neighbor configuration 
+    # with different password in R1 
+    r1BGPBadConfig = ["config t",
+                      "int gi0/1",
+                      "router bgp 100",
+                      "neighbor 10.10.10.2 remote-as 100",
+                      "neighbor 10.10.10.2 password juniper",
+                      "neighbor 10.10.10.2 update-source gi0/1",
+                      "no auto-summary",
+                      "end",
+                      "exit"]
+
+    r1config = r1Intconfig + r1BGPConfig
+    r2config = r2Intconfig + r2BGPConfig
+
     def test_router_connect_success(self):
         """Test whether conncetion with router is successfull"""
-        router1 = {'hostname': '10.1.1.10',
-                   'port': '22',
-                   'username': 'bkoppad',
-                   'password': 'cisco'}
         user1 = bgp_router_config.BGP_Router()
-        res = user1.connect_ssh(router1)
-        self.assertTrue(True, res)
-
-    def test_router_connect_failur(self):
-        """Test connection with router fails due to authentication issue"""
-        router2 = {'hostname': '10.1.1.20',
-                   'port': '22',
-                   'username': 'bkoppad2',
-                   'password': 'juniper'}
-        user2 = bgp_router_config.BGP_Router()
-        res = user2.connect_ssh(router2)
+        res = user1.connect_ssh(self.router1)
         self.assertTrue(True, res)
 
     @patch('builtins.input', side_effect=['show ip bgp', 'exit'])
-    def test_router_cli_access_1(self, input):
+    def test_router_cli_access(self, input):
         """Test command exceution on router working as expected"""
-        router = {'hostname': '10.1.1.10',
-                  'port': '22',
-                  'username': 'bkoppad',
-                  'password': 'cisco'}
-        user3 = bgp_router_config.BGP_Router()
-        user3.connect_ssh(router)
-        res = "".join(user3.cli_access())
-        # print("Output==", res)
+        user2 = bgp_router_config.BGP_Router()
+        user2.connect_ssh(self.router2)
+        res = "".join(user2.cli_access())
         self.assertIn('BGP not active', res.replace('\r\n', ' '))
+
+    def test_router_connect_failur(self):
+        """Test connection with router fails due to authentication issue"""
+        user3 = bgp_router_config.BGP_Router()
+        res = user3.connect_ssh(self.router3)
+        self.assertTrue(True, res)
+
+    @patch('builtins.input', side_effect= r1config + r2config)
+    def test_bgp_neighbour_up_same_passwword(self,input):
+        """Configure Interfaces and BGP Protocol on 2 routers R1 and R2"""
+        user1 = bgp_router_config.BGP_Router()
+        user1.connect_ssh(self.router1)
+        res1 = "".join(user1.cli_access())
+        print("User 1 op" , res1)
+
+        user2 = bgp_router_config.BGP_Router()
+        user2.connect_ssh(self.router2)
+        res2 = "".join(user2.cli_access())
+        print("User 2 op" , res2)
+
+    @patch('builtins.input', side_effect= r1BGPBadConfig)
+    def test_bgp_neighbour_down_different_passwword(self,input):
+        """Configure Interfaces and BGP Protocol on 2 routers R1 and R2"""
+        user1 = bgp_router_config.BGP_Router()
+        user1.connect_ssh(self.router1)
+        res1 = "".join(user1.cli_access())
+        print("User 1 op" , res1)
+
