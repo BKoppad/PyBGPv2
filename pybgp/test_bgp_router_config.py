@@ -51,8 +51,8 @@ class ConnectSshTests(SimpleTestCase):
                    "end",
                    "exit"]
 
-    # Cisco router commands for BGP Neighbor configuration 
-    # with different password in R1 
+    # Cisco router commands for BGP Neighbor configuration
+    # with different password in R1
     r1BGPBadConfig = ["config t",
                       "int gi0/1",
                       "router bgp 100",
@@ -86,24 +86,23 @@ class ConnectSshTests(SimpleTestCase):
         res = user3.connect_ssh(self.router3)
         self.assertTrue(True, res)
 
-    @patch('builtins.input', side_effect= r1config + r2config)
-    def test_bgp_neighbour_up_same_passwword(self,input):
+    @patch('builtins.input', side_effect=r1config + r2config)
+    def test_bgp_neighbour_up_same_passwword(self, input):
         """Configure Interfaces and BGP Protocol on 2 routers R1 and R2"""
         user1 = bgp_router_config.BGP_Router()
         user1.connect_ssh(self.router1)
         res1 = "".join(user1.cli_access())
-        print("User 1 op" , res1)
+        print("User 1 op", res1)
 
         user2 = bgp_router_config.BGP_Router()
         user2.connect_ssh(self.router2)
         res2 = "".join(user2.cli_access())
-        print("User 2 op" , res2)
+        print("User 2 op", res2)
 
-    @patch('builtins.input', side_effect= r1BGPBadConfig)
-    def test_bgp_neighbour_down_different_passwword(self,input):
+    @patch('builtins.input', side_effect=r1BGPBadConfig)
+    def test_bgp_neighbour_down_different_passwword(self, input):
         """Configure Interfaces and BGP Protocol on 2 routers R1 and R2"""
         user1 = bgp_router_config.BGP_Router()
         user1.connect_ssh(self.router1)
         res1 = "".join(user1.cli_access())
-        print("User 1 op" , res1)
-
+        print("User 1 op", res1)
