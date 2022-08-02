@@ -24,17 +24,17 @@ class ConnectSshTests(SimpleTestCase):
     # by altering its password for negative testing
     router3 = router1.copy()
     router3['password'] = 'juniper'
-    
-    #Get Interface configuration from DB  for R1 and R2
+
+    # Get Interface configuration from DB  for R1 and R2
     r1Intconfig_db = rdb.get_config("r1Intconfig")
     r2Intconfig_db = rdb.get_config("r2Intconfig")
-    # Get BGP configuration with same password from DB for R1 and R2 
+    # Get BGP configuration with same password from DB for R1 and R2
     r1BGPConfig_db = rdb.get_config("r1BGPConfig")
     r2BGPConfig_db = rdb.get_config("r2BGPConfig")
 
     # Get BGP configuration with different password from DB for R1
     r1BGPBadConfig_db = rdb.get_config("r1BGPBadConfig")
-    
+
     r1config = r1Intconfig_db + r1BGPConfig_db
     r2config = r2Intconfig_db + r2BGPConfig_db
 
@@ -56,11 +56,13 @@ class ConnectSshTests(SimpleTestCase):
         print("Successfully verfied command execution on the router")
 
     def testC_router_connect_failur(self):
-        print("\nTest case 3:Verifying error for wrong password while connecting")
+        print("\nTest case 3:Verifying error for wrong password\
+             while connecting")
         user3 = bgp_router_config.BGP_Router()
         res = user3.connect_ssh(self.router3)
         self.assertTrue(True, res)
-        print("Successfully Verified error for wrong password while connecting")
+        print("Successfully Verified error for wrong password\
+             while connecting")
 
     @patch('builtins.input', side_effect=r1config + r2config)
     def testD_bgp_neighbour_with_same_password_configured(self, input):
@@ -79,33 +81,38 @@ class ConnectSshTests(SimpleTestCase):
 
     @patch('builtins.input', side_effect=['show ip bgp summary', 'exit'])
     def testE_bgp_neighbour_up_when_same_password_configured(self, input):
-        print("\nTest case 5: Verify BGP Neighnour is up on 2 routers R1 and R2 when\
-        same password configured successfully")
+        print("\nTest case 5: Verify BGP Neighnour is up on\
+             R1 and R2 when same password configured")
         user1 = bgp_router_config.BGP_Router()
         user1.connect_ssh(self.router1)
         res1 = "".join(user1.cli_access())
         print("User 1 op", res1)
         self.assertIn("10.10.10.2", res1.replace('\r\n', ' '))
         self.assertNotIn("Idle", res1.replace('\r\n', ' '))
+        print("\n Successfully Verified BGP Neighnour up on\
+             R1 and R2 when same password configured")
 
     @patch('builtins.input', side_effect=r1BGPBadConfig_db)
     def testF_bgp_neighbour_down_with_different_passwword(self, input):
-        print("\nTest case 6: Verify BGP configuration with different password on R-1")
+        print("\nTest case 6: Verify BGP configuration with\
+             different password on R-1")
         user1 = bgp_router_config.BGP_Router()
         user1.connect_ssh(self.router1)
         res1 = "".join(user1.cli_access())
         print("User 1 op", res1)
         self.assertNotIn("Invalid input detected", res1.replace('\r\n', ' '))
-        print("Successfully verified BGP configuration with different password")
-
+        print("Successfully verified BGP configuration with\
+             different password")
 
     @patch('builtins.input', side_effect=['show ip bgp summary', 'exit'])
     def testG_bgp_neighbour_when_different_password_configured(self, input):
-        print ("\nTest case 7: Verify BGP Neighnour status going down post password change in R-1")
+        print("\nTest case 7: Verify BGP Neighnour status going down post\
+        password change in R-1")
         user1 = bgp_router_config.BGP_Router()
         user1.connect_ssh(self.router1)
         res1 = "".join(user1.cli_access())
         print("User 1 op", res1)
         self.assertIn("10.10.10.2", res1.replace('\r\n', ' '))
         self.assertIn("Idle", res1.replace('\r\n', ' '))
-        print ("Successfully Verified BGP Neighnour status going down post password change in R-1")
+        print("Successfully Verified BGP Neighnour status going down post\
+             password change in R-1")
