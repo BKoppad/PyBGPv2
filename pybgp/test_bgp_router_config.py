@@ -4,7 +4,8 @@ Sample tests for bgp_router_config.py
 from django.test import SimpleTestCase
 from unittest.mock import patch
 from pybgp import bgp_router_config
-import time
+# import time
+
 
 class ConnectSshTests(SimpleTestCase):
     """" Test connect_ssh module """
@@ -88,7 +89,7 @@ class ConnectSshTests(SimpleTestCase):
 
     @patch('builtins.input', side_effect=r1config + r2config)
     def test_bgp_neighbour_with_same_password_configured(self, input):
-        """Verify Interfaces and BGP Protocol on 2 routers R1 and R2 with 
+        """Verify Interfaces and BGP Protocol on 2 routers R1 and R2 with
         same password configured successfully"""
         user1 = bgp_router_config.BGP_Router()
         user1.connect_ssh(self.router1)
@@ -103,17 +104,17 @@ class ConnectSshTests(SimpleTestCase):
 
     @patch('builtins.input', side_effect=['show ip bgp summary', 'exit'])
     def test_bgp_neighbour_up_when_same_password_configured(self, input):
-        """Verify BGP Neighnour is up on 2 routers R1 and R2 when 
+        """Verify BGP Neighnour is up on 2 routers R1 and R2 when
         same password configured successfully"""
         user1 = bgp_router_config.BGP_Router()
         user1.connect_ssh(self.router1)
         res1 = "".join(user1.cli_access())
         print("User 1 op", res1)
-        self.assertIn("10.10.10.2",res1.replace('\r\n', ' '))
-        self.assertNotIn("Idle",res1.replace('\r\n', ' '))
+        self.assertIn("10.10.10.2", res1.replace('\r\n', ' '))
+        self.assertNotIn("Idle", res1.replace('\r\n', ' '))
 
     @patch('builtins.input', side_effect=r1BGPBadConfig)
-    def test_bgp_neighbour_down_different_passwword(self, input):
+    def test_bgp_neighbour_down_with_different_passwword(self, input):
         """Configure Interfaces and BGP Protocol on 2 routers R1 and R2
         with different password and verify BGP going down"""
         user1 = bgp_router_config.BGP_Router()
@@ -122,14 +123,16 @@ class ConnectSshTests(SimpleTestCase):
         print("User 1 op", res1)
         self.assertNotIn("Invalid input detected", res1.replace('\r\n', ' '))
 
-    time.sleep(500)
+    # Wait for around 10 minutes for BGP session to idle state
+    # time.sleep(500)
+
     @patch('builtins.input', side_effect=['show ip bgp summary', 'exit'])
-    def test_bgp_neighbour_up_when_same_password_configured(self, input):
-        """Verify BGP Neighnour is up on 2 routers R1 and R2 when 
+    def test_bgp_neighbour_when_different_password_configured(self, input):
+        """Verify BGP Neighnour is up on 2 routers R1 and R2 when
         same password configured successfully"""
         user1 = bgp_router_config.BGP_Router()
         user1.connect_ssh(self.router1)
         res1 = "".join(user1.cli_access())
         print("User 1 op", res1)
-        self.assertIn("10.10.10.2",res1.replace('\r\n', ' '))
-        self.assertIn("Idle",res1.replace('\r\n', ' '))
+        self.assertIn("10.10.10.2", res1.replace('\r\n', ' '))
+        self.assertIn("Idle", res1.replace('\r\n', ' '))
