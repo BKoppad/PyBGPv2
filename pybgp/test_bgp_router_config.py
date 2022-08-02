@@ -4,6 +4,7 @@ Sample tests for bgp_router_config.py
 from django.test import SimpleTestCase
 from unittest.mock import patch
 from pybgp import bgp_router_config
+# from pybgp import router_config_db as rdb
 # import time
 
 
@@ -30,6 +31,7 @@ class ConnectSshTests(SimpleTestCase):
                    "int gi0/1",
                    "ip address 10.10.10.1 255.255.255.0",
                    "no shut"]
+    # r1Intconfig_db = rdb.get_config("r1Intconfig")
     r2Intconfig = ["config t",
                    "int gi0/1",
                    "ip address 10.10.10.2 255.255.255.0",
